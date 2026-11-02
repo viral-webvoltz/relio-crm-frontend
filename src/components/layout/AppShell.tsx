@@ -1,4 +1,4 @@
-import { BarChart3, Building2, CalendarClock, CircleDollarSign, FileSignature, FileText, Fingerprint, History, KeyRound, LayoutDashboard, LifeBuoy, ListChecks, ListPlus, LogOut, MailPlus, Megaphone, Menu, Package, PanelLeftClose, PanelLeftOpen, Repeat, ScrollText, Send, ShieldCheck, ShoppingCart, Shuffle, Tags, Target, Timer, Trash2, Trophy, UserCog, Users, UsersRound, Webhook, Workflow, X } from 'lucide-react'
+import { BarChart3, Building2, CalendarClock, CircleDollarSign, FileSignature, FileText, Fingerprint, History, KeyRound, LayoutDashboard, LifeBuoy, ListChecks, ListPlus, LogOut, Mail, MailPlus, Megaphone, Menu, Package, PanelLeftClose, PanelLeftOpen, Repeat, ScrollText, Send, ShieldCheck, ShoppingCart, Shuffle, Tags, Target, Timer, Trash2, Trophy, UserCog, Users, UsersRound, Webhook, Workflow, X } from 'lucide-react'
 import { confirmDialog } from '@/components/ui/ConfirmHost'
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -38,6 +38,7 @@ const navItems = [
   { to: '/settings/users', label: 'Users', icon: UserCog, end: false, permission: 'users.manage', group: 'Settings' },
   { to: '/settings/roles', label: 'Roles', icon: ShieldCheck, end: false, permission: 'settings.manage', group: 'Settings' },
   { to: '/settings/notices', label: 'Customer notices', icon: Megaphone, end: false, permission: 'portal.manage', group: 'Settings' },
+  { to: '/settings/email', label: 'Email configuration', icon: Mail, end: false, permission: 'settings.manage', group: 'Settings' },
   { to: '/settings/email-templates', label: 'Email templates', icon: MailPlus, end: false, permission: 'settings.manage', group: 'Settings' },
   { to: '/settings/sla', label: 'Response targets', icon: Timer, end: false, permission: 'settings.manage', group: 'Settings' },
   { to: '/settings/teams', label: 'Teams', icon: UsersRound, end: false, permission: 'settings.manage', group: 'Settings' },

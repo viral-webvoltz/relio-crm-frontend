@@ -1,12 +1,13 @@
 import { format, parseISO } from 'date-fns'
-import { Plus } from 'lucide-react'
+import { Mail, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Badge } from '@/components/ui/Badge'
 import { confirmDialog, promptDialog } from '@/components/ui/ConfirmHost'
 import { DataTable, type Column } from '@/components/ui/DataTable'
-import { useDeleteWorkflow, useRunAsMe, useToggleWorkflow, useUpdateWorkflowSettings, useWorkflowQueue, useWorkflowSettings, useWorkflows } from '../hooks/useWorkflows'
+import { useDeleteWorkflow, useRunAsMe, useSaveWorkflow, useToggleWorkflow, useUpdateWorkflowSettings, useWorkflowQueue, useWorkflowSettings, useWorkflows } from '../hooks/useWorkflows'
+import { leadWelcomeTemplate } from '../templates'
 import { validTimezone } from '../graph'
 import { triggerLabel, type Workflow } from '../types'
 
@@ -54,6 +55,13 @@ export function WorkflowsPage() {
   const toggle = useToggleWorkflow()
   const remove = useDeleteWorkflow()
   const runAsMe = useRunAsMe()
+  const createFromTemplate = useSaveWorkflow()
+
+  const addWelcomeTemplate = () =>
+    createFromTemplate.mutate(leadWelcomeTemplate, {
+      onSuccess: () => toast.success('Added, and paused. Edit the email text, then turn it on.'),
+      onError: (e) => toast.error(e.message),
+    })
 
   const handleToggle = (w: Workflow) =>
     toggle.mutate({ id: w.id, isActive: !w.isActive }, { onSuccess: () => toast.success(w.isActive ? 'Workflow paused' : 'Workflow resumed'), onError: (e) => toast.error(e.message) })
@@ -112,7 +120,14 @@ export function WorkflowsPage() {
       <PageHeader
         title="Workflows"
         subtitle="Do something automatically — create a task or send a notification — when something changes."
-        actions={<Link to="/settings/workflows/new" className="btn-primary"><Plus className="size-4" aria-hidden /> New workflow</Link>}
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <button type="button" className="btn-ghost" onClick={addWelcomeTemplate} disabled={createFromTemplate.isPending}>
+              <Mail className="size-4" aria-hidden /> {createFromTemplate.isPending ? 'Adding…' : 'Add lead introduction email'}
+            </button>
+            <Link to="/settings/workflows/new" className="btn-primary"><Plus className="size-4" aria-hidden /> New workflow</Link>
+          </div>
+        }
       />
       <TimezoneNote />
       <QueueNote />

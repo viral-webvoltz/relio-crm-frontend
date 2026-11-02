@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/Button'
 import { CompanySelect } from '@/components/entity/EntitySelects'
 import { Field } from '@/components/ui/Field'
 import { RecordActivity } from '@/features/activities/components/RecordActivity'
+import { RecordEmails } from '@/features/record-emails/components/RecordEmails'
 import { TimelinePanel } from '@/features/timeline/components/TimelinePanel'
 import { ContactDocumentsPanel } from '@/features/portal-admin/components/ContactDocumentsPanel'
 import { PortalAccessPanel } from '@/features/customers/components/PortalAccessPanel'
@@ -96,6 +97,7 @@ export function ContactFormPage() {
       </form>
       {id && <PortalAccessPanel contactId={id} defaultEmail={contact?.email ?? ''} />}
       {id && <ContactDocumentsPanel contactId={id} />}
+      {id && <RecordEmails entity="contact" entityId={id} email={contact?.email} />}
       {id && <RecordActivity relatedType="contact" relatedId={id} />}
       {id && <TimelinePanel entity="contact" entityId={id} />}
       {id && <DocumentsPanel entityType="contact" entityId={id} />}

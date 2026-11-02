@@ -8,9 +8,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Relio</title>
+    <style>
+      /* Shown from the first paint until the app has loaded; React replaces it. Mirrors components/ui/AppLoader. */
+      body { margin: 0; }
+      .boot { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; background: #f4f6fb; font-family: Inter, system-ui, sans-serif; }
+      .boot-mark { position: relative; width: 56px; height: 56px; }
+      .boot-mark::before { content: ''; position: absolute; inset: 0; border-radius: 14px; background: rgba(47, 107, 255, .25); animation: boot-ping 1.4s cubic-bezier(0, 0, .2, 1) infinite; }
+      .boot-mark svg { position: relative; width: 56px; height: 56px; border-radius: 14px; }
+      .boot-name { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -.01em; color: #101828; text-align: center; }
+      .boot-sub { margin: 4px 0 0; font-size: 14px; color: #667085; text-align: center; }
+      .boot-bar { width: 160px; height: 4px; overflow: hidden; border-radius: 999px; background: #e4e7ec; }
+      .boot-bar::after { content: ''; display: block; width: 33%; height: 100%; border-radius: 999px; background: #2f6bff; animation: boot-slide 1.2s ease-in-out infinite; }
+      @keyframes boot-ping { 75%, 100% { transform: scale(1.6); opacity: 0; } }
+      @keyframes boot-slide { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
+      @media (prefers-reduced-motion: reduce) { .boot-mark::before, .boot-bar::after { animation: none; } }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot" role="status" aria-live="polite">
+        <div class="boot-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40">
+            <defs>
+              <linearGradient id="boot-bg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#2f6bff" /><stop offset="1" stop-color="#5b4bdb" /></linearGradient>
+            </defs>
+            <rect width="40" height="40" rx="11" fill="url(#boot-bg)" />
+            <path d="M14 29V11h7.5a5.5 5.5 0 0 1 0 11H14m6.5 0 5.2 7" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="29" cy="29.5" r="2.6" fill="#a5f3fc" />
+          </svg>
+        </div>
+        <div>
+          <p class="boot-name">Relio</p>
+          <p class="boot-sub">Loading your workspace…</p>
+        </div>
+        <div class="boot-bar" aria-hidden="true"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

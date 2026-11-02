@@ -13,6 +13,7 @@ import { UserSelect } from '@/components/entity/EntitySelects'
 import { Field } from '@/components/ui/Field'
 import { SelectField } from '@/components/ui/SelectField'
 import { RecordActivity } from '@/features/activities/components/RecordActivity'
+import { RecordEmails } from '@/features/record-emails/components/RecordEmails'
 import { useCan } from '@/features/auth/hooks/useCan'
 import { CustomFieldsSection } from '@/features/custom-fields/components/CustomFieldsSection'
 import { useCustomFieldDefinitions } from '@/features/custom-fields/hooks/useCustomFields'
@@ -98,6 +99,7 @@ export function LeadFormPage() {
           <Link to="/leads" className="btn-ghost">Cancel</Link>
         </div>
       </form>
+      {id && <RecordEmails entity="lead" entityId={id} email={lead?.email} />}
       {id && <RecordActivity relatedType="lead" relatedId={id} />}
       {id && <DocumentsPanel entityType="lead" entityId={id} />}
     </>

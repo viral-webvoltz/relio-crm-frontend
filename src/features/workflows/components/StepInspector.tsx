@@ -1,8 +1,9 @@
 import { Plus, Trash2 } from 'lucide-react'
-import { useId, type ReactNode } from 'react'
+import { useId, useRef, type ReactNode } from 'react'
 import { Select } from '@/components/ui/Select'
 import { isTimedTrigger, needsValue, operators, kindLabel, weekdays, type ConfigMap, type Kind, type Rule, type StepData } from '../graph'
 import { editableFields, triggers, type FieldMeta } from '../types'
+import { PlaceholderChips, PlaceholderCheck } from './PlaceholderHelper'
 
 const timezones: string[] = typeof Intl.supportedValuesOf === 'function' ? Intl.supportedValuesOf('timeZone') : []
 
@@ -24,17 +25,40 @@ function Row({ label, hint, children }: { label: string; hint?: string; children
   )
 }
 
-const Text = ({ label, value, onChange, hint, placeholder, multiline, type = 'text' }: { label: string; value: string; onChange: (v: string) => void; hint?: string; placeholder?: string; multiline?: boolean; type?: string }) => (
-  <Row label={label} hint={hint}>
-    {(id) =>
-      multiline ? (
-        <textarea id={id} rows={3} className="input-base h-auto py-2" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
-      ) : (
-        <input id={id} type={type} className="input-base" autoComplete="off" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
-      )
-    }
-  </Row>
-)
+type TextProps = { label: string; value: string; onChange: (v: string) => void; hint?: string; placeholder?: string; multiline?: boolean; type?: string; placeholders?: FieldMeta[] }
+
+// With `placeholders`, the box also offers the record's fields as buttons and says what each {{name}} typed in it will become.
+const Text = ({ label, value, onChange, hint, placeholder, multiline, type = 'text', placeholders }: TextProps) => {
+  const box = useRef<HTMLInputElement & HTMLTextAreaElement>(null)
+
+  const insert = (key: string) => {
+    const el = box.current
+    const token = `{{${key}}}`
+    const start = el?.selectionStart ?? value.length
+    const end = el?.selectionEnd ?? start
+    onChange(value.slice(0, start) + token + value.slice(end))
+    requestAnimationFrame(() => {
+      el?.focus()
+      el?.setSelectionRange(start + token.length, start + token.length)
+    })
+  }
+
+  return (
+    <Row label={label} hint={hint}>
+      {(id) => (
+        <>
+          {multiline ? (
+            <textarea id={id} ref={box} rows={3} className="input-base h-auto py-2" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+          ) : (
+            <input id={id} ref={box} type={type} className="input-base" autoComplete="off" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+          )}
+          {placeholders && <PlaceholderChips fields={placeholders} onInsert={insert} />}
+          {placeholders && <PlaceholderCheck text={value} fields={placeholders} />}
+        </>
+      )}
+    </Row>
+  )
+}
 
 const Choice = ({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) => (
   <Row label={label}>
@@ -119,8 +143,8 @@ export function StepInspector({ data, trigger, orgTimezone, outputs, onConnect, 
       const c = data.config
       body = (
         <>
-          <Text label="Title" value={c.title} onChange={(title) => set(c, { title })} hint={PLACEHOLDER_HINT} />
-          <Text label="Description" multiline value={c.description} onChange={(description) => set(c, { description })} />
+          <Text label="Title" value={c.title} onChange={(title) => set(c, { title })} hint={PLACEHOLDER_HINT} placeholders={fields} />
+          <Text label="Description" multiline value={c.description} onChange={(description) => set(c, { description })} placeholders={fields} />
           <Choice label="Priority" value={c.priority} onChange={(v) => set(c, { priority: v as typeof c.priority })} options={[{ value: 'low', label: 'Low' }, { value: 'medium', label: 'Medium' }, { value: 'high', label: 'High' }]} />
           <Text label="Due in (days)" type="number" value={c.dueInDays} onChange={(dueInDays) => set(c, { dueInDays })} placeholder="No due date" />
           <Choice label="Assign to" value={c.assignTo} onChange={(assignTo) => set(c, { assignTo })} options={who} />
@@ -134,7 +158,7 @@ export function StepInspector({ data, trigger, orgTimezone, outputs, onConnect, 
         <>
           <Choice label="Send to" value={c.userId} onChange={(userId) => set(c, { userId })} options={who} />
           <Text label="Title" value={c.title} onChange={(title) => set(c, { title })} hint={PLACEHOLDER_HINT} />
-          <Text label="Message (optional)" multiline value={c.body} onChange={(body) => set(c, { body })} />
+          <Text label="Message (optional)" multiline value={c.body} onChange={(body) => set(c, { body })} placeholders={fields} />
         </>
       )
       break
@@ -148,7 +172,7 @@ export function StepInspector({ data, trigger, orgTimezone, outputs, onConnect, 
           ) : (
             <p className="text-sm text-muted">Records from this trigger cannot be updated by a workflow.</p>
           )}
-          <Text label="New value" value={c.value} onChange={(value) => set(c, { value })} hint={PLACEHOLDER_HINT} />
+          <Text label="New value" value={c.value} onChange={(value) => set(c, { value })} hint={PLACEHOLDER_HINT} placeholders={fields} />
         </>
       )
       break
@@ -157,9 +181,9 @@ export function StepInspector({ data, trigger, orgTimezone, outputs, onConnect, 
       const c = data.config
       body = (
         <>
-          <Text label="To" value={c.to} onChange={(to) => set(c, { to })} hint="An email address, or {{email}} to use the record's email." />
-          <Text label="Subject" value={c.subject} onChange={(subject) => set(c, { subject })} hint={PLACEHOLDER_HINT} />
-          <Text label="Message" multiline value={c.body} onChange={(body) => set(c, { body })} />
+          <Text label="To" value={c.to} onChange={(to) => set(c, { to })} hint="An email address, or {{email}} to use the record's email." placeholders={fields} />
+          <Text label="Subject" value={c.subject} onChange={(subject) => set(c, { subject })} hint={PLACEHOLDER_HINT} placeholders={fields} />
+          <Text label="Message" multiline value={c.body} onChange={(body) => set(c, { body })} placeholders={fields} />
         </>
       )
       break
@@ -170,7 +194,7 @@ export function StepInspector({ data, trigger, orgTimezone, outputs, onConnect, 
         <>
           <Choice label="Method" value={c.method} onChange={(v) => set(c, { method: v as typeof c.method })} options={[{ value: 'POST', label: 'POST' }, { value: 'PUT', label: 'PUT' }, { value: 'GET', label: 'GET' }]} />
           <Text label="Address" type="url" value={c.url} onChange={(url) => set(c, { url })} placeholder="https://example.com/hook" hint="Must be a public https address." />
-          <Text label="Body (JSON, optional)" multiline value={c.body} onChange={(body) => set(c, { body })} hint={PLACEHOLDER_HINT} />
+          <Text label="Body (JSON, optional)" multiline value={c.body} onChange={(body) => set(c, { body })} hint={PLACEHOLDER_HINT} placeholders={fields} />
         </>
       )
       break
