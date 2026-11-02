@@ -1,32 +1,59 @@
-# React + TypeScript + Vite
+# Relio CRM – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+The web app for Relio CRM: a staff app for sales, support and finance work, and a separate customer portal, both in one bundle.
 
-Currently, two official plugins are available:
+Built with React 19, TypeScript, Vite, Tailwind v4, TanStack Query, react-hook-form with zod, and React Router v7. It talks to the [Relio CRM backend](../Backend).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What's in it
 
-## React Compiler
+- **Staff app:** contacts, companies, leads, deals pipeline, tasks, quotes, invoices, orders, subscriptions, tickets, campaigns, workflows, goals, documents, reports, and settings for users, roles, teams, API keys and webhooks.
+- **Customer portal** (`/portal/*`): customers sign in separately to see their documents, invoices and tickets.
+- **Public pages:** quote links, unsubscribe links and password reset.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Requirements
 
-## Expanding the Oxlint configuration
+- Node.js 20 or newer
+- The backend running (default `http://localhost:4000`)
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## Getting started
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+cp .env.example .env
+npm run dev          # http://localhost:5173
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Environment
+
+| Variable | Notes |
+| --- | --- |
+| `VITE_API_URL` | Where the API runs, with no `/api/v1` suffix. Leave empty in development to use the Vite proxy to `http://localhost:4000`. In production, set it to the API URL, for example `https://api.example.com` |
+
+The same value is used to build the Content Security Policy `connect-src` for production builds.
+
+## Scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server with hot reload |
+| `npm run build` | Type-check and build to `dist/` |
+| `npm run preview` | Serve the production build |
+| `npm run lint` | oxlint |
+
+## Project layout
+
+```
+src/
+  app/            App shell, providers, router, config
+  components/     ui (shared building blocks), layout, entity selects
+  features/<name> One folder per feature: api, hooks, pages, components, schemas
+  lib/            httpClient, query client, list state, shared hooks
+```
+
+`src/features/contacts` is the reference for how a feature is built. More detail for contributors is in [CLAUDE.md](CLAUDE.md).
+
+## Deploying (Vercel)
+
+1. Import the repo and set `VITE_API_URL` to the API URL.
+2. On the backend, set `CORS_ORIGIN` to the exact URL of this site, with no trailing slash.
+3. Sign-in is cookie-based. If the site and the API are on different domains, the browser may block the cookie, so keep both under the same parent domain, or use the bearer token returned by the login response.
