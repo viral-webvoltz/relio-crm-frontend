@@ -28,7 +28,28 @@ function toApiError(error: AxiosError<Partial<ApiError>>): ApiError {
   }
 }
 
+// The session token is kept in localStorage and sent as a Bearer header, because the cookie is cross-site (vercel.app -> API domain).
+const TOKEN_KEY = 'token'
+const store = (token?: string) => { try { token ? localStorage.setItem(TOKEN_KEY, token) : localStorage.removeItem(TOKEN_KEY) } catch { /* storage blocked: cookie still works where allowed */ } }
+
+httpClient.interceptors.request.use((config) => {
+  let token: string | null = null
+  try { token = localStorage.getItem(TOKEN_KEY) } catch { /* storage blocked */ }
+  if (token) config.headers.set('Authorization', `Bearer ${token}`)
+  return config
+})
+
 httpClient.interceptors.response.use(
-  (response) => response,
-  (error) => Promise.reject(isAxiosError(error) && !axios.isCancel(error) ? toApiError(error) : error),
+  (response) => {
+    const url = response.config.url ?? ''
+    if (/^\/auth\/(login|login\/2fa|register)$/.test(url)) store(response.data?.data?.token)
+    if (url === '/auth/logout') store()
+    return response
+  },
+  (error) => {
+    if (isAxiosError(error) && error.response?.status === 401 && error.config?.url === '/auth/me') store()
+    return handle(error)
+  },
 )
+
+const handle = (error: unknown) => Promise.reject(isAxiosError(error) && !axios.isCancel(error) ? toApiError(error) : error)
