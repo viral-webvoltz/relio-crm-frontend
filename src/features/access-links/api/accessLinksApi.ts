@@ -13,4 +13,5 @@ export async function createAccessLink(expiresInMinutes: number) {
   return data.data
 }
 export const revokeAccessLink = (id: string) => httpClient.delete(`/access-links/${id}`)
+export const startDemo = () => httpClient.post('/access-links/demo')
 export const redeemAccessLink = (token: string) => httpClient.post('/access-links/redeem', { token })

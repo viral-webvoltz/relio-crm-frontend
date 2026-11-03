@@ -23,4 +23,6 @@ export function useRevokeAccessLink() {
   })
 }
 
+export const useStartDemo = () => useMutation<unknown, ApiError, void>({ mutationFn: api.startDemo })
+
 export const useRedeemAccessLink = () => useMutation<unknown, ApiError, string>({ mutationFn: api.redeemAccessLink })
