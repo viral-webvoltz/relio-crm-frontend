@@ -36,9 +36,13 @@ export function AccountPage() {
             <p className="mt-3 text-xs text-muted">To change your name or email, ask an administrator.</p>
           </section>
         )}
-        <ChangePasswordCard />
-        <TwoFactorCard />
-        <SessionsCard />
+        {!user?.viaAccessLink && (
+          <>
+            <ChangePasswordCard />
+            <TwoFactorCard />
+            <SessionsCard />
+          </>
+        )}
       </div>
     </>
   )

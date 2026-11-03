@@ -8,6 +8,8 @@ export type CurrentUser = {
   email: string
   fullName: string
   permissions: string[]
+  /** True when signed in from a shared access link: security and sharing settings are hidden. */
+  viaAccessLink?: boolean
 }
 
 export async function getCurrentUser() {

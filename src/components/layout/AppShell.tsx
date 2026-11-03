@@ -1,4 +1,4 @@
-import { BarChart3, Building2, CalendarClock, CircleDollarSign, FileSignature, FileText, Fingerprint, History, KeyRound, LayoutDashboard, LifeBuoy, ListChecks, ListPlus, LogOut, Mail, MailPlus, Megaphone, Menu, Package, PanelLeftClose, PanelLeftOpen, Repeat, ScrollText, Send, ShieldCheck, ShoppingCart, Shuffle, Tags, Target, Timer, Trash2, Trophy, UserCog, Users, UsersRound, Webhook, Workflow, X } from 'lucide-react'
+import { BarChart3, Link2, Building2, CalendarClock, CircleDollarSign, FileSignature, FileText, Fingerprint, History, KeyRound, LayoutDashboard, LifeBuoy, ListChecks, ListPlus, LogOut, Mail, MailPlus, Megaphone, Menu, Package, PanelLeftClose, PanelLeftOpen, Repeat, ScrollText, Send, ShieldCheck, ShoppingCart, Shuffle, Tags, Target, Timer, Trash2, Trophy, UserCog, Users, UsersRound, Webhook, Workflow, X } from 'lucide-react'
 import { confirmDialog } from '@/components/ui/ConfirmHost'
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -43,6 +43,7 @@ const navItems = [
   { to: '/settings/sla', label: 'Response targets', icon: Timer, end: false, permission: 'settings.manage', group: 'Settings' },
   { to: '/settings/teams', label: 'Teams', icon: UsersRound, end: false, permission: 'settings.manage', group: 'Settings' },
   { to: '/settings/assignment', label: 'Assignment rules', icon: Shuffle, end: false, permission: 'settings.manage', group: 'Settings' },
+  { to: '/settings/access-links', label: 'Client access links', icon: Link2, end: false, permission: 'settings.manage', group: 'Settings', hideForLink: true },
   { to: '/settings/api-keys', label: 'API keys', icon: KeyRound, end: false, permission: 'settings.manage', group: 'Settings' },
   { to: '/settings/privacy', label: 'Privacy and data', icon: Fingerprint, end: false, permission: 'privacy.manage', group: 'Settings' },
   { to: '/settings/tags', label: 'Tags', icon: Tags, end: false, permission: 'contacts.update', group: 'Settings' },
@@ -57,7 +58,7 @@ function GuardedOutlet() {
   const { pathname } = useLocation()
   const { data: user } = useCurrentUser()
   const area = navItems.find((item) => item.permission && (pathname === item.to || pathname.startsWith(`${item.to}/`)))
-  return area?.permission && !user?.permissions.includes(area.permission) ? <NoAccess /> : <Outlet />
+  return area?.permission && (!user?.permissions.includes(area.permission) || (area.hideForLink && user.viaAccessLink)) ? <NoAccess /> : <Outlet />
 }
 
 const COLLAPSE_KEY = 'crm.sidebarCollapsed'
@@ -93,7 +94,7 @@ type SidebarProps = { collapsed: boolean; onLogout: () => void; loggingOut: bool
 // One nav used by the desktop sidebar and the mobile drawer. Collapsed keeps accessible names via sr-only text + title.
 function SidebarContent({ collapsed, onLogout, loggingOut }: SidebarProps) {
   const { data: user } = useCurrentUser()
-  const visible = navItems.filter((item) => !item.permission || user?.permissions.includes(item.permission))
+  const visible = navItems.filter((item) => (!item.permission || user?.permissions.includes(item.permission)) && !(item.hideForLink && user?.viaAccessLink))
   const groups = [...new Set(visible.map((item) => item.group))]
 
   return (

@@ -42,7 +42,7 @@ httpClient.interceptors.request.use((config) => {
 httpClient.interceptors.response.use(
   (response) => {
     const url = response.config.url ?? ''
-    if (/^\/auth\/(login|login\/2fa|register)$/.test(url)) store(response.data?.data?.token)
+    if (/^\/auth\/(login|login\/2fa|register)$/.test(url) || url === '/access-links/redeem') store(response.data?.data?.token)
     if (url === '/auth/logout') store()
     return response
   },

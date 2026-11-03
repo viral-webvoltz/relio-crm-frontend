@@ -27,6 +27,7 @@ export const router = createBrowserRouter([
   { path: '/forgot-password', ...page(() => import('@/features/auth/pages/ForgotPasswordPage'), 'ForgotPasswordPage') },
   { path: '/reset-password', ...page(() => import('@/features/auth/pages/ResetPasswordPage'), 'ResetPasswordPage') },
   { path: '/unsubscribe/:token', ...page(() => import('@/features/campaigns/pages/PublicUnsubscribePage'), 'PublicUnsubscribePage') },
+  { path: '/access/:token', ...page(() => import('@/features/access-links/pages/AccessLinkPage'), 'AccessLinkPage') },
   { path: '/quote/:token', ...page(() => import('@/features/quotes/pages/PublicQuotePage'), 'PublicQuotePage') },
   // Customer portal: its own layout, guards and session, completely separate from the staff app below.
   {
@@ -132,6 +133,7 @@ export const router = createBrowserRouter([
           { path: '/settings/sla', ...page(() => import('@/features/tickets/pages/SlaPolicyPage'), 'SlaPolicyPage') },
           { path: '/settings/teams', ...page(() => import('@/features/teams/pages/TeamsPage'), 'TeamsPage') },
           { path: '/settings/assignment', ...page(() => import('@/features/assignment/pages/AssignmentRulesPage'), 'AssignmentRulesPage') },
+          { path: '/settings/access-links', ...page(() => import('@/features/access-links/pages/AccessLinksPage'), 'AccessLinksPage') },
           { path: '/settings/api-keys', ...page(() => import('@/features/api-keys/pages/ApiKeysPage'), 'ApiKeysPage') },
           { path: '/settings/privacy', ...page(() => import('@/features/privacy/pages/PrivacyPage'), 'PrivacyPage') },
           { path: '/settings/tags', ...page(() => import('@/features/tags/pages/TagsPage'), 'TagsPage') },
