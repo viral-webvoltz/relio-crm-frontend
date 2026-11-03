@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { confirmDialog } from '@/components/ui/ConfirmHost'
+import { Select } from '@/components/ui/Select'
 import { DataTable, type Column } from '@/components/ui/DataTable'
 import type { AccessLink, CreatedAccessLink } from '../api/accessLinksApi'
 import { useAccessLinks, useCreateAccessLink, useRevokeAccessLink } from '../hooks/useAccessLinks'
@@ -64,18 +65,19 @@ export function AccessLinksPage() {
       <PageHeader
         title="Client access links"
         subtitle="Give a client a link that signs them in to this account for a limited time. They will not see this page."
-        actions={
-          <div className="flex items-center gap-2">
-            <label className="sr-only" htmlFor="link-duration">Link lasts</label>
-            <select id="link-duration" className="input-base" value={minutes} onChange={(e) => setMinutes(Number(e.target.value))}>
-              {durations.map((d) => <option key={d.minutes} value={d.minutes}>{d.label}</option>)}
-            </select>
-            <button type="button" className="btn-primary" disabled={create.isPending} onClick={() => create.mutate(minutes, { onSuccess: setCreated, onError: (e) => toast.error(e.message) })}>
-              <Plus className="size-4" aria-hidden /> Create link
-            </button>
-          </div>
-        }
       />
+      <section className="card mb-4 flex flex-wrap items-end gap-3 p-4" aria-label="Create a link">
+        <div className="w-full sm:w-52">
+          <label htmlFor="link-duration" className="mb-1.5 block text-sm font-medium text-heading">Link lasts</label>
+          <Select id="link-duration" value={minutes} onChange={(e) => setMinutes(Number(e.target.value))}>
+            {durations.map((d) => <option key={d.minutes} value={d.minutes}>{d.label}</option>)}
+          </Select>
+        </div>
+        <button type="button" className="btn-primary w-full whitespace-nowrap sm:w-auto" disabled={create.isPending} onClick={() => create.mutate(minutes, { onSuccess: setCreated, onError: (e) => toast.error(e.message) })}>
+          <Plus className="size-4" aria-hidden /> {create.isPending ? 'Creating…' : 'Create link'}
+        </button>
+        <p className="w-full text-xs text-muted">After that time the link stops working and the client is signed out.</p>
+      </section>
       {created && <NewLink key={created.id} created={created} onDone={() => setCreated(null)} />}
       <DataTable
         caption="Active access links"
